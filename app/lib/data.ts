@@ -484,51 +484,51 @@ export async function fetchProduk() {
   }
 }
 
-export async function fetchTransaksi() {
-  try {
-    const data = await sql<transaksiField>`
-      SELECT
-        id_transaksi,
-        id_karyawan,
-        id_pelanggan,
-        total_transaksi,
-        waktu_transaksi,
-        poin
-      FROM transaksi
-      ORDER BY waktu_transaksi ASC
-    `;
-
-    const transaksi = data.rows;
-    return transaksi;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch all customers.');
-  }
-}
-
 // export async function fetchTransaksi() {
 //   try {
 //     const data = await sql<transaksiField>`
-// SELECT 
-//     t.id_transaksi,
-//     t.id_karyawan,
-//     t.id_pelanggan,
-//     p.nama_pelanggan,
-//     t.total_transaksi,
-//     t.waktu_transaksi
-// FROM transaksi t
-// JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
-// ORDER BY t.total_transaksi ASC
-// `;
+//       SELECT
+//         id_transaksi,
+//         id_karyawan,
+//         id_pelanggan,
+//         total_transaksi,
+//         waktu_transaksi,
+//         poin
+//       FROM transaksi
+//       ORDER BY waktu_transaksi ASC
+//     `;
 
 //     const transaksi = data.rows;
-//     console.log('Fetched transaksi:', transaksi); // Log hasil dari database
 //     return transaksi;
 //   } catch (err) {
 //     console.error('Database Error:', err);
-//     throw new Error('Failed to fetch transaksi table.');
+//     throw new Error('Failed to fetch all customers.');
 //   }
 // }
+
+export async function fetchTransaksi() {
+  try {
+    const data = await sql<transaksiField>`
+SELECT 
+    t.id_transaksi,
+    t.id_karyawan,
+    t.id_pelanggan,
+    p.nama_pelanggan,
+    t.total_transaksi,
+    t.waktu_transaksi
+FROM transaksi t
+JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
+ORDER BY t.total_transaksi ASC
+`;
+
+    const transaksi = data.rows;
+    console.log('Fetched transaksi:', transaksi); // Log hasil dari database
+    return transaksi;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch transaksi table.');
+  }
+}
 
 // export async function fetchTransaksi() {
 //   try {

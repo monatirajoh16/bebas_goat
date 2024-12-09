@@ -102,7 +102,7 @@ export default function Form({
             defaultValue=""
           >
             <option value="" disabled>
-              Select a Karyawan (Optional)
+              Select a Karyawan 
             </option>
             {karyawan.map((employee, index) => (
               <option key={index} value={employee.id_karyawan}>
