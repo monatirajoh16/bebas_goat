@@ -1,9 +1,9 @@
 'use client';
 
-import { produkField } from '../../lib/definitions';
+import { produkField } from 'app/lib/definitions';
 import Link from 'next/link';
 import { CurrencyDollarIcon, UserCircleIcon } from '@heroicons/react/24/outline';
-import { Button } from '../../ui/button';
+import { Button } from 'app/ui/button';
 import { createProduk } from '@/app/lib/action';
 import React, { useState } from 'react';
 

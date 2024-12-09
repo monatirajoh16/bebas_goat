@@ -1142,9 +1142,9 @@ export async function updateMy_reward(id: string, formData: FormData) {
   }
 }
 
-export async function fetchPelangganByNoHp(no_hp: string): Promise<pelangganField | null> {
+export async function fetchPelangganByNoHp(nomor_hp_pelanggan: string): Promise<pelangganField | null> {
   try {
-    console.log("Fetching pelanggan with nomor_hp_pelanggan:", no_hp);
+    console.log("Fetching pelanggan with nomor_hp_pelanggan:", nomor_hp_pelanggan);
 
     // Pastikan query SQL memfilter berdasarkan nomor_hp_pelanggan
     const result = await sql<pelangganField>`
@@ -1157,7 +1157,7 @@ export async function fetchPelangganByNoHp(no_hp: string): Promise<pelangganFiel
         my.poin
       FROM pelanggan p
       JOIN myreward my ON p.id_pelanggan = my.id_pelanggan
-      WHERE p.nomor_hp_pelanggan = ${no_hp}  -- Filter berdasarkan nomor_hp_pelanggan
+      WHERE p.nomor_hp_pelanggan = ${nomor_hp_pelanggan}  -- Filter berdasarkan nomor_hp_pelanggan
       ORDER BY my.poin DESC
     `;
 
