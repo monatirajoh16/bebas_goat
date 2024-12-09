@@ -216,44 +216,44 @@ import { v4 as uuidvv4 } from 'uuid'; // Import UUID generator
 
 import fs from 'fs';
 import path from 'path';
-import { revalidatePath, redirect } from 'next/navigation'; // Pastikan Anda mengimpor fungsi ini dari Next.js
+// import { revalidatePath, redirect } from 'next/navigation'; // Pastikan Anda mengimpor fungsi ini dari Next.js
 
+
+
+// API untuk mengambil daftar gambar
+export function getAvailableImages() {
+  const imagesDir = path.join(process.cwd(), "public", "images");
+  try {
+    // Ambil daftar file dari folder "public/images"
+    const files = fs.readdirSync(imagesDir);
+    const imageFiles = files.filter((file) =>
+      /\.(png|jpg|jpeg|gif|webp)$/.test(file)
+    ); // Filter file gambar
+    return imageFiles;
+  } catch (error) {
+    console.error("Unable to fetch images:", error);
+    return [];
+  }
+}
+
+// Fungsi untuk membuat produk
 export async function createProduk(formData: FormData) {
-  const id_produk = uuidv4(); // Generate a new UUID for id_produk
-  const nama_produk = formData.get('nama_produk')?.toString() || '';
-  const harga_produk = formData.get('harga_produk')?.toString() || '';
-  const kategori_produk = formData.get('kategori_produk')?.toString() || '';
+  const id_produk = uuidv4(); // Generate a new UUID untuk ID produk
+  const nama_produk = formData.get("nama_produk")?.toString() || "";
+  const harga_produk = formData.get("harga_produk")?.toString() || "";
+  const kategori_produk = formData.get("kategori_produk")?.toString() || "";
+  const gambar = formData.get("gambar")?.toString() || ""; // Mengambil gambar sebagai string
 
-  // Ambil file gambar dari form data
-  const gambarFile = formData.get('gambar') as File;
-
-  if (!gambarFile) {
-    throw new Error('No image file provided'); // Error jika tidak ada gambar
+  // Validasi input
+  if (!nama_produk || !harga_produk || !kategori_produk || !gambar) {
+    throw new Error("Semua data harus diisi");
   }
 
-  // Tentukan path di folder public untuk menyimpan gambar
-  const uploadDir = path.join(process.cwd(), 'public', 'images');
-  
-  // Gunakan nama asli file ditambah dengan timestamp untuk menghindari duplikasi
-  const extname = path.extname(gambarFile.name); // Ekstensi file
-  const timestamp = Date.now(); // Menambahkan timestamp untuk menghindari nama duplikat
-  const fileName = `${timestamp}${extname}`; // Kombinasi timestamp dan ekstensi file
-  const filePath = path.join(uploadDir, fileName);
-
-  // Pastikan folder tujuan ada
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  // Cek apakah gambar yang dipilih ada di folder images
+  const availableImages = getAvailableImages();
+  if (!availableImages.includes(path.basename(gambar))) {
+    throw new Error("Gambar yang dipilih tidak valid");
   }
-
-  // Simpan gambar ke disk
-  const arrayBuffer = await gambarFile.arrayBuffer();
-  const uint8Array = new Uint8Array(arrayBuffer);
-
-  // Gunakan fs.promises.writeFile untuk menyimpan gambar
-  await fs.promises.writeFile(filePath, uint8Array);
-
-  // Dapatkan URL gambar yang benar
-  const gambarUrl = `/images/${fileName}`;
 
   // Persiapkan data untuk dimasukkan ke database
   const parsedData = {
@@ -261,7 +261,7 @@ export async function createProduk(formData: FormData) {
     nama_produk,
     harga_produk,
     kategori_produk,
-    gambar: gambarUrl, // Simpan URL gambar yang benar
+    gambar, // Simpan string gambar langsung ke database
   };
 
   // Masukkan data ke tabel produk
@@ -271,8 +271,8 @@ export async function createProduk(formData: FormData) {
   `;
 
   // Revalidate dan redirect setelah sukses
-  revalidatePath('/dashboard/produk');
-  redirect('/dashboard/produk');
+  revalidatePath("/dashboard/produk");
+  redirect("/dashboard/produk");
 }
 
 

@@ -5,11 +5,27 @@ import Link from 'next/link';
 import { CurrencyDollarIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../ui/button';
 import { createProduk } from '@/app/lib/action';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Form({ produk = [] }: { produk: produkField[] }) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>(""); // Tambahkan state untuk gambar yang dipilih
+  const [imageOptions, setImageOptions] = useState<string[]>([]); // Tambahkan state untuk daftar gambar
+
+  // Fetch daftar gambar dari server
+  useEffect(() => {
+    async function fetchImages() {
+      try {
+        const response = await fetch('/api/get-images'); // Endpoint API untuk mendapatkan daftar gambar
+        const data = await response.json();
+        setImageOptions(data); // Set daftar gambar ke state
+      } catch (error) {
+        console.error('Failed to fetch images:', error);
+      }
+    }
+    fetchImages();
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -106,21 +122,26 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
           <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
         </div>
 
-        {/* Gambar Produk */}
+        {/* Pilih Gambar */}
         <div className="mb-4">
-          <label htmlFor="gambar" className="mb-2 block text-sm font-medium">
-            Gambar Produk
+          <label htmlFor="gambar" className="block text-sm font-medium">
+            Pilih Gambar
           </label>
-          <div className="relative mt-2 rounded-md">
-            <input
-              id="gambar"
-              name="gambar"
-              type="file"
-              accept="image/*"
-              className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-            />
-          </div>
+          <select
+            id="gambar"
+            name="gambar"
+            value={selectedImage}
+            onChange={(e) => setSelectedImage(e.target.value)}
+            className="w-full rounded border px-3 py-2"
+            required
+          >
+            <option value="">Pilih Gambar</option>
+            {imageOptions.map((image) => (
+              <option key={image} value={`/images/${image}`}>
+                {image}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="mt-6 flex justify-end gap-4">
