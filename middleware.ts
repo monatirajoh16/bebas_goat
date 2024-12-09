@@ -5,7 +5,7 @@ export function middleware(req: NextRequest) {
     const { searchParams, pathname } = new URL(req.url);
 
     // Jalankan middleware ini hanya untuk path /dashboard
-    if (pathname === '/dashboard') {
+    if (pathname === '/https://bebas-goat.vercel.app/') {
         const callbackUrl = searchParams.get('callbackUrl');
 
         if (callbackUrl) {
