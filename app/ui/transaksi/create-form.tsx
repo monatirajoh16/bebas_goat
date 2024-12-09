@@ -178,7 +178,7 @@ export default function Form({
         {/* Pilih Pelanggan */}
         <div className="mb-4">
           <label htmlFor="id_pelanggan" className="mb-2 block text-sm font-medium text-gray-700">
-            Pilih Pelanggan (Wajib)
+            Pilih Pelanggan 
           </label>
           <select
             id="id_pelanggan"

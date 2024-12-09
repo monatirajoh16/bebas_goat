@@ -1170,29 +1170,21 @@ ORDER BY t.waktu_transaksi DESC
 }
 
 export async function fetchTransaksiPages(query: string, currentPage: number) {
-  try {
-    const data = await sql<TransaksiTable>`
-SELECT 
-    t.id_transaksi,
-    t.id_karyawan,
-    t.id_pelanggan,
-    p.nama_pelanggan,
-    t.total_transaksi,
-    t.waktu_transaksi
-FROM transaksi t
-JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
-ORDER BY t.total_transaksi ASC
-`;
 
-    const transaksi = data.rows;
-    console.log('Fetched transaksi:', transaksi); // Log hasil dari database
-    return transaksi;
-  } catch (err) {
-    console.error('Database Error:', err);
-    throw new Error('Failed to fetch transaksi table.');
+    unstable_noStore()
+    try {
+      const count = await sql`
+      SELECT COUNT(*)
+      FROM transaksi
+      `;
+  
+      const totalPages = Math.ceil(Number(count.rows[0].count));
+      return totalPages;
+    } catch (error) {
+      console.error('Database Error:', error);
+      throw new Error('Failed to fetch total number of bahan.');
+    }
   }
-}
-
 // export async function fetchFilteredProduk(
 //   query: string,
 //   currentPage: number) {
