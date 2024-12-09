@@ -717,7 +717,7 @@ export async function fetchBahan() {
 
 export async function fetchPelanggan() {
   try {
-    const data = await sql<pelangganField>`
+    const data = await sql<PelangganTable>`
       SELECT
     p.id_pelanggan,
     p.id_jenjang,
