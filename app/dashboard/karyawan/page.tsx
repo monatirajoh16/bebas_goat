@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect, Suspense } from 'react';
 import Search from '../../ui/search';
 import Table from '../../ui/karyawan/table';
