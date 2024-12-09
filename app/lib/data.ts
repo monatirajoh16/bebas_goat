@@ -842,10 +842,9 @@ export async function fetchPelangganById(id: string) {
 export async function fetchFilteredKaryawan(query: string, currentPage: number) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
+    const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<karyawanTable>`
@@ -862,7 +861,6 @@ export async function fetchFilteredKaryawan(query: string, currentPage: number) 
       FROM karyawan
       WHERE LOWER(nama_karyawan) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       ORDER BY nama_karyawan ASC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const karyawan = data.rows;
@@ -882,10 +880,9 @@ export async function fetchFilteredProduk(
 ) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
+    const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<produkTable>`
@@ -898,7 +895,6 @@ export async function fetchFilteredProduk(
       FROM produk
       WHERE LOWER(nama_produk) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       ORDER BY nama_produk ASC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const produk = data.rows;
@@ -1032,10 +1028,9 @@ export async function fetchFilteredPelanggan(
 ) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
+    const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<PelangganTable>`
@@ -1051,7 +1046,6 @@ export async function fetchFilteredPelanggan(
       WHERE LOWER(p.nama_pelanggan) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       OR p.nomor_hp_pelanggan LIKE ${`%${query}%`} -- Optionally filter by phone number
       ORDER BY my.poin DESC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const pelanggan = data.rows;
@@ -1066,10 +1060,9 @@ export async function fetchFilteredPelanggan(
 export async function fetchFilteredBahan(query: string, currentPage: number) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
+    const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<BahanTable>`
@@ -1082,7 +1075,6 @@ export async function fetchFilteredBahan(query: string, currentPage: number) {
       FROM bahan
       WHERE LOWER(nama_bahan) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       ORDER BY nama_bahan ASC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const bahan = data.rows;
@@ -1097,10 +1089,8 @@ export async function fetchFilteredBahan(query: string, currentPage: number) {
 export async function fetchFilteredTransaksi(query: string, currentPage: number) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<TransaksiTable>`
@@ -1118,7 +1108,6 @@ export async function fetchFilteredTransaksi(query: string, currentPage: number)
       WHERE LOWER(p.nama_pelanggan) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       OR t.id_transaksi::text LIKE ${`%${query}%`} -- Optionally filter by transaction ID
       ORDER BY t.waktu_transaksi DESC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const transaksi = data.rows;
@@ -1266,10 +1255,9 @@ ORDER BY t.total_transaksi ASC
 export async function fetchFilteredMy_reward(query: string, currentPage: number) {
   try {
     // Define the number of items per page
-    const itemsPerPage = 10; // Adjust this as needed
 
     // Calculate the offset for pagination
-    const offset = (currentPage - 1) * itemsPerPage;
+    const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
     const data = await sql<My_rewardTable>`
@@ -1286,7 +1274,6 @@ export async function fetchFilteredMy_reward(query: string, currentPage: number)
       WHERE LOWER(p.nama_pelanggan) LIKE LOWER(${`%${query}%`}) -- Filter based on the query
       OR p.nomor_hp_pelanggan LIKE ${`%${query}%`} -- Optionally filter by phone number
       ORDER BY my.poin DESC
-      LIMIT ${itemsPerPage} OFFSET ${offset} -- Implement pagination
     `;
 
     const myreward = data.rows;
