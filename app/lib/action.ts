@@ -211,11 +211,12 @@ export async function createKaryawan(formData: FormData) {
 
 import { v4 as uuidvv4 } from 'uuid'; // Import UUID generator
 
+
+
+
 import fs from 'fs';
 import path from 'path';
-
-
-
+import { revalidatePath, redirect } from 'next/navigation'; // Pastikan Anda mengimpor fungsi ini dari Next.js
 
 export async function createProduk(formData: FormData) {
   const id_produk = uuidv4(); // Generate a new UUID for id_produk
@@ -244,7 +245,7 @@ export async function createProduk(formData: FormData) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  // Simpan gambar ke disk tanpa menggunakan Buffer
+  // Simpan gambar ke disk
   const arrayBuffer = await gambarFile.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
 
@@ -273,6 +274,7 @@ export async function createProduk(formData: FormData) {
   revalidatePath('/dashboard/produk');
   redirect('/dashboard/produk');
 }
+
 
 
 
