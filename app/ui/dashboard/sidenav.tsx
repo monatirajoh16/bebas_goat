@@ -38,10 +38,12 @@ export default function SideNav() {
             await signOut();
           }}
         >
+          <Link href="/login" passHref>
           <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-[#FFEFD6] p-3 text-sm font-medium text-[#4A3622] hover:bg-[#FFE3BA] hover:text-[#4A3622] md:flex-none md:justify-start md:p-2 md:px-3">
             <ArrowLeftOnRectangleIcon className="w-6" />
             <div className="hidden md:block">Sign Out</div>
           </button>
+          </Link>
         </form>
       </div>
     </div>
