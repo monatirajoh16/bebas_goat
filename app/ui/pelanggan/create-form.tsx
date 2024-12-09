@@ -1,6 +1,6 @@
 'use client';
 
-import { pelangganField } from '../../lib/definitions';
+import { PelangganTable } from '../../lib/definitions';
 import Link from 'next/link';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '../../ui/button';
@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 export default function Form({
   pelanggan = [],
 }: {
-  pelanggan: pelangganField[];
+  pelanggan: PelangganTable[];
 }) {
   const [error, setError] = useState<string | null>(null);
 
