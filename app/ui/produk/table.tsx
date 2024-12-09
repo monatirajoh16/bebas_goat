@@ -81,7 +81,7 @@ export default async function produkTable({
                         {p.kategori_produk}
                       </td>
                       <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
-                        {p.gambar}
+                      {p.gambar || '1.png'}
                       </td>
                       {/* <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         {p.gambar ? (
