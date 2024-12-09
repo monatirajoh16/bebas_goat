@@ -8,7 +8,7 @@ import {
   karyawanField,
   produkField,
   jenjangField,
-  PelangganTable,
+  pelangganField,
   my_rewardField,
 } from '../../lib/definitions';
 import { createTransaksi } from '@/app/lib/action';
@@ -18,7 +18,7 @@ type FormProps = {
   karyawan: karyawanField[];
   produk: produkField[];
   jenjang: jenjangField[];
-  pelanggan: PelangganTable[];
+  pelanggan: pelangganField[];
   my_reward: my_rewardField[];
 };
 

@@ -717,7 +717,7 @@ export async function fetchBahan() {
 
 export async function fetchPelanggan() {
   try {
-    const data = await sql<PelangganTable>`
+    const data = await sql<pelangganField>`
       SELECT
     p.id_pelanggan,
     p.id_jenjang,
@@ -1030,7 +1030,7 @@ export async function fetchFilteredPelanggan(
     const offset = (currentPage - 1);
 
     // Use parameterized queries to prevent SQL injection
-    const data = await sql<PelangganTable>`
+    const data = await sql<pelangganField>`
       SELECT
         p.id_pelanggan,
         p.id_jenjang,
