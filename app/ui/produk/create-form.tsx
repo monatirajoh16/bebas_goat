@@ -19,7 +19,7 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
     const namaProduk = formData.get('nama_produk')?.toString().trim();
     const hargaProduk = formData.get('harga_produk');
     const kategoriProduk = formData.get('kategori_produk');
-    const gambar = formData.get('gambar');
+    const gambar = formData.get('gambar') as File;
 
     // Clear previous error messages
     setError(null);
@@ -27,13 +27,24 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
 
     // Validation
     if (!namaProduk || !hargaProduk || !kategoriProduk || !gambar) {
-      setError('Data belum diisi.');
+      setError('Semua data harus diisi.');
+      return;
+    }
+
+    // Check file type and size
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!validImageTypes.includes(gambar.type)) {
+      setError('Tipe file tidak valid. Harap unggah gambar JPEG, PNG, atau GIF.');
+      return;
+    }
+    if (gambar.size > 5 * 1024 * 1024) { // Limit to 5MB
+      setError('Ukuran file terlalu besar. Maksimal 5MB.');
       return;
     }
 
     const isDuplicate = produk.some((item) => item.nama_produk.toLowerCase() === namaProduk.toLowerCase());
     if (isDuplicate) {
-      setError('Data sudah ada.');
+      setError('Produk dengan nama ini sudah ada.');
       return;
     }
 
@@ -71,6 +82,7 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
               className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm placeholder:text-gray-500"
               required
               aria-describedby="nama_produk_help"
+              disabled={isLoading} // Disable input during loading
             />
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
@@ -93,6 +105,7 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
               className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm placeholder:text-gray-500"
               required
               aria-describedby="harga_produk_help"
+              disabled={isLoading} // Disable input during loading
             />
             <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
           </div>
@@ -114,6 +127,7 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
               defaultValue=""
               required
               aria-describedby="kategori_produk_help"
+              disabled={isLoading} // Disable input during loading
             >
               <option value="" disabled>
                 Pilih Kategori
@@ -141,6 +155,7 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
               accept="image/*"
               className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm placeholder:text-gray-500"
               required
+              disabled={isLoading} // Disable input during loading
             />
           </div>
         </div>

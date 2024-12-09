@@ -220,6 +220,9 @@ import path from 'path';
 
 
 
+
+
+
 export async function createProduk(formData: FormData) {
   const id_produk = uuidv4(); // Generate a new UUID for id_produk
   const nama_produk = formData.get('nama_produk')?.toString() || "";
@@ -235,7 +238,7 @@ export async function createProduk(formData: FormData) {
 
   // Tentukan path di folder public untuk menyimpan gambar
   const uploadDir = path.join(process.cwd(), 'public', 'images');
-  
+
   // Gunakan nama asli file ditambah dengan timestamp untuk menghindari duplikasi
   const extname = path.extname(gambarFile.name); // Ekstensi file
   const timestamp = Date.now(); // Menambahkan timestamp untuk menghindari nama duplikat
@@ -247,14 +250,34 @@ export async function createProduk(formData: FormData) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  // Simpan gambar ke disk
-  const arrayBuffer = await gambarFile.arrayBuffer(); // Ambil ArrayBuffer
-  const buffer = Buffer.from(arrayBuffer); // Konversi ArrayBuffer ke Buffer
+  // Create a writable stream to save the image file
+  const writableStream = fs.createWriteStream(filePath);
 
-  // Convert Buffer to Uint8Array for compatibility
-  const uint8Array = new Uint8Array(buffer);
+  // Read the file as a stream and pipe it to the writable stream
+  const fileStream = gambarFile.stream(); // This is how you get the ReadableStream from a File object
 
-  fs.writeFileSync(filePath, uint8Array); // Simpan Uint8Array ke file
+  // Check if fileStream is available
+  if (fileStream && fileStream.getReader) {
+    const reader = fileStream.getReader();
+
+    // Read the stream and write to the writable stream
+    const read = async () => {
+      const { done, value } = await reader.read();
+      if (done) {
+        writableStream.end(); // Close the writable stream when done
+        return;
+      }
+      writableStream.write(value); // Write the chunk to the file
+      read(); // Read the next chunk
+    };
+    
+    read().catch((err) => {
+      writableStream.end(); // Close the stream on error
+      console.error("Stream reading error:", err);
+    });
+  } else {
+    throw new Error("Could not create a readable stream from the file.");
+  }
 
   // Dapatkan URL gambar yang benar
   const gambarUrl = `/images/${fileName}`;
@@ -278,10 +301,6 @@ export async function createProduk(formData: FormData) {
   revalidatePath('/dashboard/produk');
   redirect('/dashboard/produk');
 }
-
-
-
-
 
 // Function to handle image upload (e.g., upload to cloud storage)
 async function uploadImageToStorage(file: File): Promise<string> {
