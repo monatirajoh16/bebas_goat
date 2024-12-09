@@ -507,6 +507,7 @@ export async function fetchProduk() {
 // }
 
 export async function fetchTransaksi() {
+  unstable_noStore()
   try {
     const data = await sql<transaksiField>`
 SELECT 
