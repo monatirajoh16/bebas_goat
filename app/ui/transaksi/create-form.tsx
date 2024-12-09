@@ -1,7 +1,14 @@
 'use client';
-import { transaksiField, karyawanField, produkField,jenjangField, pelangganField, my_rewardField } from '../../lib/definitions';
+import {
+  transaksiField,
+  karyawanField,
+  produkField,
+  jenjangField,
+  pelangganField,
+  my_rewardField,
+} from '../../lib/definitions';
 import React, { useState } from 'react';
-import { UserCircleIcon, PlusIcon, MinusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
 
 export default function Form({
   transaksi = [],
@@ -14,13 +21,14 @@ export default function Form({
   transaksi: transaksiField[];
   karyawan: karyawanField[];
   produk: produkField[];
-  jenjang: jenjangField[]; // Add jenjang prop
-  pelanggan: pelangganField[]; // Add pelanggan prop
-  my_reward: my_rewardField[]; // Add my_reward prop
+  jenjang: jenjangField[];
+  pelanggan: pelangganField[];
+  my_reward: my_rewardField[];
 }) {
   const [produkList, setProdukList] = useState<
     { id_produk: string; nama_produk: string; harga_produk: number; quantity: number }[]
   >([]);
+  const [selectedPelanggan, setSelectedPelanggan] = useState<pelangganField | null>(null);
   const [discount, setDiscount] = useState('');
 
   const totalTransaksi = produkList.reduce(
@@ -52,21 +60,6 @@ export default function Form({
     });
   };
 
-  const handleQuantityChange = (id_produk: string, increment: boolean) => {
-    setProdukList((prev) =>
-      prev.map((produkItem) =>
-        produkItem.id_produk === id_produk
-          ? {
-              ...produkItem,
-              quantity: increment
-                ? produkItem.quantity + 1
-                : Math.max(produkItem.quantity - 1, 1),
-            }
-          : produkItem
-      )
-    );
-  };
-
   const formatRupiah = (value: number) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
 
@@ -75,21 +68,46 @@ export default function Form({
       <div className="rounded-md bg-[#D4B499] p-4 md:p-6">
         <h2 className="text-lg font-semibold mb-6">Tambah Transaksi</h2>
 
-        {/* No HP Pelanggan */}
+        {/* Pilih Pelanggan */}
         <div className="mb-4">
-          <label htmlFor="no_hp" className="mb-2 block text-sm font-medium">
+          <label htmlFor="pelanggan" className="mb-2 block text-sm font-medium">
+            Pilih Pelanggan
+          </label>
+          <select
+            id="pelanggan"
+            name="pelanggan"
+            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm bg-[#D4B499]"
+            value={selectedPelanggan?.id_pelanggan || ''}
+            onChange={(e) => {
+              const pelangganId = e.target.value;
+              const pelangganData = pelanggan.find((p) => p.id_pelanggan === pelangganId);
+              setSelectedPelanggan(pelangganData || null);
+            }}
+          >
+            <option value="" disabled>
+              Pilih Pelanggan
+            </option>
+            {pelanggan.map((p) => (
+              <option key={p.id_pelanggan} value={p.id_pelanggan}>
+                {p.nama_pelanggan} - {p.nomor_hp_pelanggan}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tampilkan Nomor HP Pelanggan */}
+        <div className="mb-4">
+          <label htmlFor="nomor_hp_pelanggan" className="mb-2 block text-sm font-medium">
             No HP Pelanggan
           </label>
-          <div className="relative">
-            <input
-              id="no_hp"
-              name="no_hp"
-              type="text"
-              placeholder="Masukkan No HP Pelanggan"
-              className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
-            />
-            <CheckCircleIcon className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-green-500" />
-          </div>
+          <input
+            id="nomor_hp_pelanggan"
+            name="nomor_hp_pelanggan"
+            type="text"
+            value={selectedPelanggan?.nomor_hp_pelanggan || ''}
+            readOnly
+            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
+          />
         </div>
 
         {/* Pilihan Produk */}
@@ -100,13 +118,13 @@ export default function Form({
           <select
             id="produk"
             name="produk"
-            className="block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 bg-[#D4B499]"
+            className="block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-3 text-sm bg-[#D4B499]"
             defaultValue=""
             onChange={(e) => handleAddProduct(e.target.value)}
             required
           >
             <option value="" disabled>
-              Select a Product
+              Pilih Produk
             </option>
             {produk.map((product) => (
               <option key={product.id_produk} value={product.id_produk}>
@@ -114,7 +132,6 @@ export default function Form({
               </option>
             ))}
           </select>
-          <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
         </div>
 
         {/* Daftar Produk yang Dipilih */}
@@ -131,51 +148,15 @@ export default function Form({
                 className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
               />
             </div>
-            <div className="flex items-center space-x-2 ml-4">
-              <button
-                type="button"
-                onClick={() => handleQuantityChange(produkItem.id_produk, true)}
-                className="flex items-center justify-center w-8 h-8 rounded-full border bg-gray-200 hover:bg-gray-300"
-              >
-                <PlusIcon className="h-4 w-4 text-gray-600" />
-              </button>
-              <span className="w-6 text-center">{produkItem.quantity}</span>
-              <button
-                type="button"
-                onClick={() => handleQuantityChange(produkItem.id_produk, false)}
-                className="flex items-center justify-center w-8 h-8 rounded-full border bg-gray-200 hover:bg-gray-300"
-              >
-                <MinusIcon className="h-4 w-4 text-gray-600" />
-              </button>
-            </div>
           </div>
         ))}
-
-        {/* Diskon */}
-        <div className="mb-4">
-          <label htmlFor="diskon" className="mb-2 block text-sm font-medium">
-            Diskon
-          </label>
-          <select
-            id="diskon"
-            name="diskon"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-yellow-300"
-          >
-            <option value="">Pilih Diskon</option>
-            <option value="5">5%</option>
-            <option value="10">10%</option>
-            <option value="15">15%</option>
-          </select>
-        </div>
 
         {/* Total Transaksi */}
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium">Total Transaksi</label>
           <input
             type="text"
-            value={formatRupiah(totalTransaksi * (1 - parseFloat(discount || '0') / 100))}
+            value={formatRupiah(totalTransaksi)}
             readOnly
             className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
           />
