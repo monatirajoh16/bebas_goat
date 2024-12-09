@@ -1,5 +1,5 @@
 'use client';
-import { transaksiField, karyawanField, produkField } from '../../lib/definitions';
+import { transaksiField, karyawanField, produkField,jenjangField, pelangganField, my_rewardField } from '../../lib/definitions';
 import React, { useState } from 'react';
 import { UserCircleIcon, PlusIcon, MinusIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
@@ -7,10 +7,16 @@ export default function Form({
   transaksi = [],
   karyawan = [],
   produk = [],
+  jenjang = [],
+  pelanggan = [],
+  my_reward = [],
 }: {
   transaksi: transaksiField[];
   karyawan: karyawanField[];
   produk: produkField[];
+  jenjang: jenjangField[]; // Add jenjang prop
+  pelanggan: pelangganField[]; // Add pelanggan prop
+  my_reward: my_rewardField[]; // Add my_reward prop
 }) {
   const [produkList, setProdukList] = useState<
     { id_produk: string; nama_produk: string; harga_produk: number; quantity: number }[]
