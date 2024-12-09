@@ -147,12 +147,10 @@ export async function fetchCardData() {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
     const invoices = await sql<InvoicesTable>`
@@ -173,7 +171,6 @@ export async function fetchFilteredInvoices(
         invoices.date::text ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
       ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
     return invoices.rows;
@@ -196,7 +193,7 @@ export async function fetchInvoicesPages(query: string) {
       invoices.status ILIKE ${`%${query}%`}
   `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count) );
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
@@ -949,7 +946,7 @@ export async function fetchPelangganPages(query: string) {
     FROM pelanggan
     `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count));
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
@@ -966,7 +963,7 @@ export async function fetchKaryawanPages(query: string) {
     FROM karyawan
     `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count) );
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
@@ -981,7 +978,7 @@ export async function fetchProdukPages(query: string) {
     FROM produk
     `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count) );
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
@@ -997,7 +994,7 @@ export async function fetchMy_rewardPages(query: string) {
     FROM myreward
     `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count) );
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
@@ -1014,7 +1011,7 @@ export async function fetchBahanPages(query: string) {
     FROM bahan
     `;
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(Number(count.rows[0].count));
     return totalPages;
   } catch (error) {
     console.error('Database Error:', error);
