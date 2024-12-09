@@ -81,6 +81,9 @@ export default async function produkTable({
                         {p.kategori_produk}
                       </td>
                       <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
+                        {p.nama_produk}
+                      </td>
+                      {/* <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         {p.gambar ? (
                           <Image
                             src={`/images/${p.gambar}`} // Pastikan gambar diambil dengan benar dari public/images/
@@ -92,7 +95,7 @@ export default async function produkTable({
                         ) : (
                           'No image' // Jika gambar tidak ada, tampilkan pesan
                         )}
-                      </td>
+                      </td> */}
                       <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         <div className="flex justify-center items-center gap-3">
                           <UpdateProduk id_produk={p.id_produk} />

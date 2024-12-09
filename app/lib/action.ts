@@ -228,79 +228,34 @@ export async function createProduk(formData: FormData) {
   const nama_produk = formData.get('nama_produk')?.toString() || "";
   const harga_produk = formData.get('harga_produk')?.toString() || "";
   const kategori_produk = formData.get('kategori_produk')?.toString() || "";
+  const gambarUrl = formData.get('gambar')?.toString().trim(); // Get the image URL from form data
 
-  // Ambil file gambar dari form data
-  const gambarFile = formData.get('gambar') as File;
-
-  if (!gambarFile) {
-    throw new Error("No image file provided"); // Error jika tidak ada gambar
+  // Validate that the gambarUrl is provided
+  if (!gambarUrl) {
+    throw new Error("No image URL provided"); // Error if no image URL
   }
 
-  // Tentukan path di folder public untuk menyimpan gambar
-  const uploadDir = path.join(process.cwd(), 'public', 'images');
-
-  // Gunakan nama asli file ditambah dengan timestamp untuk menghindari duplikasi
-  const extname = path.extname(gambarFile.name); // Ekstensi file
-  const timestamp = Date.now(); // Menambahkan timestamp untuk menghindari nama duplikat
-  const fileName = `${timestamp}${extname}`; // Kombinasi timestamp dan ekstensi file
-  const filePath = path.join(uploadDir, fileName);
-
-  // Pastikan folder tujuan ada
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  // Create a writable stream to save the image file
-  const writableStream = fs.createWriteStream(filePath);
-
-  // Read the file as a stream and pipe it to the writable stream
-  const fileStream = gambarFile.stream(); // This is how you get the ReadableStream from a File object
-
-  // Check if fileStream is available
-  if (fileStream && fileStream.getReader) {
-    const reader = fileStream.getReader();
-
-    // Read the stream and write to the writable stream
-    const read = async () => {
-      const { done, value } = await reader.read();
-      if (done) {
-        writableStream.end(); // Close the writable stream when done
-        return;
-      }
-      writableStream.write(value); // Write the chunk to the file
-      read(); // Read the next chunk
-    };
-    
-    read().catch((err) => {
-      writableStream.end(); // Close the stream on error
-      console.error("Stream reading error:", err);
-    });
-  } else {
-    throw new Error("Could not create a readable stream from the file.");
-  }
-
-  // Dapatkan URL gambar yang benar
-  const gambarUrl = `/images/${fileName}`;
-
-  // Persiapkan data untuk dimasukkan ke database
+  // Prepare data for database insertion
   const parsedData = {
     id_produk,
     nama_produk,
     harga_produk,
     kategori_produk,
-    gambar: gambarUrl, // Simpan URL gambar yang benar
+    gambar: gambarUrl, // Use the image URL directly
   };
 
-  // Masukkan data ke tabel produk
+  // Insert data into the products table
   await sql`
     INSERT INTO produk (id_produk, nama_produk, harga_produk, kategori_produk, gambar)
     VALUES (${parsedData.id_produk}, ${parsedData.nama_produk}, ${parsedData.harga_produk}, ${parsedData.kategori_produk}, ${parsedData.gambar})
   `;
 
-  // Revalidate dan redirect setelah sukses
+  // Revalidate and redirect after success
   revalidatePath('/dashboard/produk');
   redirect('/dashboard/produk');
 }
+
+
 
 // Function to handle image upload (e.g., upload to cloud storage)
 async function uploadImageToStorage(file: File): Promise<string> {
