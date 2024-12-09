@@ -19,26 +19,15 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
     const namaProduk = formData.get('nama_produk')?.toString().trim();
     const hargaProduk = formData.get('harga_produk');
     const kategoriProduk = formData.get('kategori_produk');
-    const gambar = formData.get('gambar') as File;
+    const gambarUrl = formData.get('gambar')?.toString().trim(); // Changed from File to string
 
     // Clear previous error messages
     setError(null);
     setSuccess(null);
 
     // Validation
-    if (!namaProduk || !hargaProduk || !kategoriProduk || !gambar) {
+    if (!namaProduk || !hargaProduk || !kategoriProduk || !gambarUrl) {
       setError('Semua data harus diisi.');
-      return;
-    }
-
-    // Check file type and size
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (!validImageTypes.includes(gambar.type)) {
-      setError('Tipe file tidak valid. Harap unggah gambar JPEG, PNG, atau GIF.');
-      return;
-    }
-    if (gambar.size > 5 * 1024 * 1024) { // Limit to 5MB
-      setError('Ukuran file terlalu besar. Maksimal 5MB.');
       return;
     }
 
@@ -51,6 +40,8 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
     setIsLoading(true); // Start loading state
 
     try {
+      // Append the gambar URL to formData for submission
+      formData.set('gambar', gambarUrl);
       await createProduk(formData);
       setSuccess('Produk berhasil dibuat!');
       event.currentTarget.reset(); // Reset the form fields
@@ -142,17 +133,17 @@ export default function Form({ produk = [] }: { produk: produkField[] }) {
           </p>
         </div>
 
-        {/* Gambar Produk */}
+        {/* Gambar Produk (Text Input) */}
         <div className="mb-4">
           <label htmlFor="gambar" className="mb-2 block text-sm font-medium">
-            Gambar Produk
+            URL Gambar Produk
           </label>
           <div className="relative mt-2 rounded-md">
             <input
               id="gambar"
               name="gambar"
-              type="file"
-              accept="image/*"
+              type="text"
+              placeholder="Masukkan URL gambar produk"
               className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm placeholder:text-gray-500"
               required
               disabled={isLoading} // Disable input during loading
