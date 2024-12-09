@@ -39,9 +39,10 @@ export default function Form({
     quantity: number;
   }[]>([]);
   const [diskon, setDiskon] = useState<number>(0);
-  const [selectedPelanggan, setSelectedPelanggan] = useState<string>(''); // Pelanggan opsional
+  const [selectedPelanggan, setSelectedPelanggan] = useState<string>(''); // Pelanggan wajib
   const [uangDiterima, setUangDiterima] = useState<string>(''); // Simpan input sebagai string
   const [kembalian, setKembalian] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string>(''); // Pesan error untuk pelanggan
 
   const totalTransaksi = produkList.reduce(
     (total, produkItem) => total + produkItem.harga_produk * produkItem.quantity,
@@ -130,29 +131,30 @@ export default function Form({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!selectedPelanggan) {
+      setErrorMessage('Pelanggan wajib dipilih.');
+      return;
+    }
+    setErrorMessage(''); // Reset pesan error jika validasi lolos
+
     const uangDiterimaNum = parseFloat(uangDiterima); // Konversi string ke angka
     if (isNaN(uangDiterimaNum) || uangDiterimaNum < totalSetelahDiskon) {
       alert('Uang yang diterima tidak mencukupi.');
       return;
     }
 
-    const selectedPelangganData = pelanggan.find((p) => p.id_pelanggan === selectedPelanggan) || {
-      id_pelanggan: null,
-      nama_pelanggan: null,
-      nomor_hp_pelanggan: null,
-      poin: 0,
-    };
+    const selectedPelangganData = pelanggan.find((p) => p.id_pelanggan === selectedPelanggan);
 
     const pointsToAdd = Math.floor(totalTransaksi / 100);
     const updatedPelangganData = {
       ...selectedPelangganData,
-      poin: (selectedPelangganData.poin || 0) + pointsToAdd,
+      poin: (selectedPelangganData?.poin || 0) + pointsToAdd,
     };
 
     const formData = new FormData();
-    formData.append('id_pelanggan', updatedPelangganData.id_pelanggan || 'null');
-    formData.append('nama_pelanggan', updatedPelangganData.nama_pelanggan || 'null');
-    formData.append('nomor_hp_pelanggan', updatedPelangganData.nomor_hp_pelanggan || 'null');
+    formData.append('id_pelanggan', updatedPelangganData?.id_pelanggan || 'null');
+    formData.append('nama_pelanggan', updatedPelangganData?.nama_pelanggan || 'null');
+    formData.append('nomor_hp_pelanggan', updatedPelangganData?.nomor_hp_pelanggan || 'null');
     formData.append('total_transaksi', totalSetelahDiskon.toString());
     formData.append('diskon', diskon.toString());
     formData.append('waktu_transaksi', new Date().toISOString());
@@ -176,11 +178,13 @@ export default function Form({
         {/* Pilih Pelanggan */}
         <div className="mb-4">
           <label htmlFor="id_pelanggan" className="mb-2 block text-sm font-medium text-gray-700">
-            Pilih Pelanggan (Opsional)
+            Pilih Pelanggan (Wajib)
           </label>
           <select
             id="id_pelanggan"
-            className="block w-full rounded-md border border-gray-300 py-2 pl-10 focus:ring-[#D4B499] focus:border-[#D4B499]"
+            className={`block w-full rounded-md border py-2 pl-10 ${
+              errorMessage ? 'border-red-500' : 'border-gray-300'
+            } focus:ring-[#D4B499] focus:border-[#D4B499]`}
             value={selectedPelanggan}
             onChange={(e) => {
               const idPelanggan = e.target.value;
@@ -188,14 +192,17 @@ export default function Form({
               updateDiskon(idPelanggan);
             }}
           >
-            <option value="">Tidak Ada Pelanggan</option>
+            <option value="">Pilih Pelanggan</option>
             {pelanggan.map((pelangganItem) => (
               <option key={pelangganItem.id_pelanggan} value={pelangganItem.id_pelanggan}>
                 {pelangganItem.nama_pelanggan} - {pelangganItem.nomor_hp_pelanggan} - Poin: {pelangganItem.poin}
               </option>
             ))}
           </select>
+          {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
         </div>
+
+        {/* Pilih Produk */}
         <div className="mb-4">
           <label htmlFor="id_produk" className="mb-2 block text-sm font-medium text-gray-700">
             Pilih Produk
