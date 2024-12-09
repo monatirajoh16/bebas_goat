@@ -90,9 +90,9 @@ export default function Form({
           <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
         </div>
 
-        {/* Select Karyawan (Optional) */}
+        {/* Select Karyawan*/}
         <label htmlFor="id_karyawan" className=" mb-2 block text-sm font-medium">
-          Karyawan (Optional)
+          Karyawan 
         </label>
         <div className="relative">
           <select
