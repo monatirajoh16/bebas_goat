@@ -154,38 +154,37 @@ export function ReportFilterUI() {
 
       <div className="mt-6">
         <div className="overflow-hidden rounded-lg border border-gray-300">
-          <table className="w-full bg-white border border-gray-300 text-gray-900">
-            <thead className="bg-gradient-to-b from-red-800 to-amber-950 text-white">
-              <tr>
-                <th className="border border-red-950 px-4 py-3 font-medium text-center">ID Transaksi</th>
-                <th className="border border-red-950 px-4 py-3 font-medium text-center">Tanggal</th>
-                <th className="border border-red-950 px-4 py-3 font-medium text-center">Nama Pelanggan</th>
-                <th className="border border-red-950 px-4 py-3 font-medium text-center">Total Transaksi</th>
-                <th className="border border-red-950 px-4 py-3 font-medium text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-[#F8EDE2]">
-              {filteredData.map((item, index) => (
-                <tr
-                  key={item.id_transaksi}
-                  className={`group transition-transform transform hover:scale-105 ${index % 2 === 0 ? 'bg-[#D8BAA2]' : 'bg-[#F0D6C1]'} hover:bg-[#4A3622] hover:text-white`}
-                >
-                  <td className="border border-gray-300 px-4 py-3 text-sm text-center">{item.id_transaksi}</td>
-                  <td className="border border-gray-300 px-4 py-3 text-sm text-center">{new Date(item.waktu_transaksi).toLocaleDateString()}</td>
-                  <td className="border border-gray-300 px-4 py-3 text-sm text-center">{item.nama_pelanggan}</td>
-                  <td className="border border-gray-300 px-4 py-3 text-sm text-center">
-                    Rp {parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+        <table className="w-full bg-white border border-gray-300 text-gray-900" style={{ tableLayout: "fixed" }}>
+    <thead className="bg-gradient-to-b from-red-800 to-amber-950 text-white">
+        <tr>
+            <th className="border border-red-950 px-4 py-3 font-medium text-center" style={{ width: "20%" }}>ID Transaksi</th>
+            <th className="border border-red-950 px-4 py-3 font-medium text-center" style={{ width: "20%" }}>Tanggal</th>
+            <th className="border border-red-950 px-4 py-3 font-medium text-center" style={{ width: "30%" }}>Nama Pelanggan</th>
+            <th className="border border-red-950 px-4 py-3 font-medium text-center" style={{ width: "20%" }}>Total Transaksi</th>
+            <th className="border border-red-950 px-4 py-3 font-medium text-center" style={{ width: "10%" }}>Aksi</th>
+        </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200 bg-[#F8EDE2]">
+        {filteredData.map((item, index) => (
+            <tr
+                key={item.id_transaksi}
+                className={`group transition-transform transform hover:scale-105 ${index % 2 === 0 ? 'bg-[#D8BAA2]' : 'bg-[#F0D6C1]'} hover:bg-[#4A3622] hover:text-white`}
+            >
+                <td className="border border-gray-300 px-4 py-3 text-sm text-center" style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{item.id_transaksi}</td>
+                <td className="border border-gray-300 px-4 py-3 text-sm text-center">{new Date(item.waktu_transaksi).toLocaleDateString()}</td>
+                <td className="border border-gray-300 px-4 py-3 text-sm text-center" style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{item.nama_pelanggan}</td>
+                <td className="border border-gray-300 px-4 py-3 text-sm text-center">Rp {parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}</td>
+                <td className="border border-gray-300 px-4 py-3 text-sm text-center">
                     <div className="flex justify-center items-center gap-3">
-                      <TampilDetail_transaksi id={item.id_transaksi} />
-                      <ExportlDetail_transaksi id={item.id_transaksi} />
+                        <TampilDetail_transaksi id={item.id_transaksi} />
+                        <ExportlDetail_transaksi id={item.id_transaksi} />
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
+
         </div>
         {filteredData.length === 0 && (
           <p className="mt-4 text-center text-white">
