@@ -113,7 +113,7 @@ export default function EditKaryawanForm({ karyawan, allKaryawan }: { karyawan: 
         {/* Nomor Rekening Karyawan */}
         <div className="mb-4">
           <label htmlFor="nomor_rekening_karyawan" className="mb-2 block text-sm font-medium">
-            Nomor Rekening Karyawan
+            Nomor Rekening Karyawann
           </label>
           <input
             id="nomor_rekening_karyawan"
