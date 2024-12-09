@@ -341,7 +341,7 @@ export async function createTransaksi(formData: FormData) {
       SELECT id_pelanggan
       FROM pelanggan
       WHERE nomor_hp_pelanggan = ${parsedData.nomor_hp_pelanggan}
-      LIMIT 1;
+      
     `;
 
     let id_pelanggan;
