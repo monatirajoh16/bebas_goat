@@ -51,54 +51,55 @@ export function ReportFilterUI() {
 
   const handlePrintPDF = () => {
     if (filteredData.length === 0) {
-      alert("Tidak ada data untuk dicetak!");
-      return;
+        alert("Tidak ada data untuk dicetak!");
+        return;
     }
 
     const doc = new jsPDF();
+    doc.setFontSize(14);
     doc.text("Laporan Transaksi Penjualan", 14, 10);
+
+    // Tambahkan periode dan total pendapatan
     doc.setFontSize(12);
-    doc.text(
-      `Periode: ${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`,
-      14,
-      20
-    );
+    doc.text(`Periode: ${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`, 14, 20);
+    doc.text(`Total Pendapatan: Rp ${totalPendapatan.toLocaleString()}`, 14, 30);
 
-    doc.text(`Total Pendapatan: Rp ${totalPendapatan.toLocaleString()}`, 14, 25);
+    // Definisi header tabel
+    const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
+    const columnWidths = [50, 40, 60, 40]; // Lebar kolom
+    const startX = 14; // Posisi awal tabel
+    let startY = 40; // Posisi awal baris
 
-    const tableColumns = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi", "Aksi"];
-    const tableRows = filteredData.map((item) => [
-      item.id_transaksi,
-      new Date(item.waktu_transaksi).toLocaleDateString(),
-      item.nama_pelanggan,
-      `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`
-    ]);
-
-    let yOffset = 30; // Initial vertical position
-
-    // Draw table headers
-    doc.setFontSize(10);
-    const headerHeight = 8;
-    const columnWidths = [30, 40, 60, 40, 30]; // Adjust column widths
-
-    tableColumns.forEach((column, index) => {
-      doc.text(column, 14 + columnWidths.slice(0, index).reduce((a, b) => a + b, 0), yOffset);
+    // Render header tabel
+    headers.forEach((header, index) => {
+        doc.text(header, startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0), startY);
     });
 
-    yOffset += headerHeight;
+    // Render isi tabel
+    startY += 8; // Tambahkan jarak untuk baris berikutnya
+    filteredData.forEach((item) => {
+        const row = [
+            item.id_transaksi,
+            new Date(item.waktu_transaksi).toLocaleDateString(),
+            item.nama_pelanggan,
+            `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`
+        ];
 
-    // Draw table rows
-    tableRows.forEach((row, rowIndex) => {
-      row.forEach((cell, cellIndex) => {
-        const cellWidth = columnWidths[cellIndex];
-        const cellHeight = 8;
-        doc.text(cell, 14 + columnWidths.slice(0, cellIndex).reduce((a, b) => a + b, 0), yOffset);
-      });
-      yOffset += 8; // Move down for the next row
+        row.forEach((cell, index) => {
+            doc.text(
+                cell,
+                startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
+                startY
+            );
+        });
+
+        startY += 8; // Tambahkan jarak untuk baris berikutnya
     });
 
+    // Simpan file PDF
     doc.save("laporan_transaksi.pdf");
-  };
+};
+
 
   return (
     <div className="w-full px-4">
