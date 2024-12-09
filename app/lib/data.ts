@@ -530,68 +530,68 @@ export async function fetchProduk() {
 //   }
 // }
 
-// export async function fetchTransaksi() {
-//   try {
-//     const data = await sql<transaksiField>`
-// SELECT 
-//     t.id_transaksi,
-//     t.id_karyawan,
-//     t.id_pelanggan,
-//     p.nama_pelanggan,
-//     p.nomor_hp_pelanggan,
-//     t.total_transaksi,
-//     t.waktu_transaksi,
-//     dt.id_detail_transaksi,
-//     dt.id_produk,
-//     dt.jumlah_transaksi,
-//     pr.nama_produk,
-//     pr.harga_produk,
-//     dd.id_detail_diskon,
-//     j.id_jenjang,
-//     j.nama_jenjang,
-//     j.diskon,
-//     j.batas_pemakaian
-// FROM transaksi t
-// JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
-// JOIN detail_transaksi dt ON t.id_transaksi = dt.id_transaksi
-// JOIN produk pr ON dt.id_produk = pr.id_produk
-// LEFT JOIN detail_diskon dd ON t.id_transaksi = dd.id_transaksi
-// LEFT JOIN jenjang j ON dd.id_jenjang = j.id_jenjang -- JOIN ke tabel jenjang
-// ORDER BY t.total_transaksi ASC
-// `;
-
-//     const transaksiWithJenjang = data.rows;
-//     console.log('Fetched transaksi with jenjang details:', transaksiWithJenjang); // Log hasil dari database
-//     return transaksiWithJenjang;
-//   } catch (err) {
-//     console.error('Database Error:', err);
-//     throw new Error('Failed to fetch transaksi with jenjang details.');
-//   }
-// }
 export async function fetchTransaksi() {
   try {
     const data = await sql<transaksiField>`
-  SELECT 
+SELECT 
     t.id_transaksi,
+    t.id_karyawan,
     t.id_pelanggan,
     p.nama_pelanggan,
     p.nomor_hp_pelanggan,
     t.total_transaksi,
-    t.waktu_transaksi
+    t.waktu_transaksi,
+    dt.id_detail_transaksi,
+    dt.id_produk,
+    dt.jumlah_transaksi,
+    pr.nama_produk,
+    pr.harga_produk,
+    dd.id_detail_diskon,
+    j.id_jenjang,
+    j.nama_jenjang,
+    j.diskon,
+    j.batas_pemakaian
 FROM transaksi t
 JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
-ORDER BY t.waktu_transaksi ASC;
-
+JOIN detail_transaksi dt ON t.id_transaksi = dt.id_transaksi
+JOIN produk pr ON dt.id_produk = pr.id_produk
+LEFT JOIN detail_diskon dd ON t.id_transaksi = dd.id_transaksi
+LEFT JOIN jenjang j ON dd.id_jenjang = j.id_jenjang -- JOIN ke tabel jenjang
+ORDER BY t.total_transaksi ASC
 `;
 
-    const transaksiWithPelangganAndJenjang = data.rows;
-    console.log('Fetched transaksi with pelanggan and jenjang details:', transaksiWithPelangganAndJenjang); // Log hasil dari database
-    return transaksiWithPelangganAndJenjang;
+    const transaksiWithJenjang = data.rows;
+    console.log('Fetched transaksi with jenjang details:', transaksiWithJenjang); // Log hasil dari database
+    return transaksiWithJenjang;
   } catch (err) {
     console.error('Database Error:', err);
-    throw new Error('Failed to fetch transaksi with pelanggan and jenjang details.');
+    throw new Error('Failed to fetch transaksi with jenjang details.');
   }
 }
+// export async function fetchTransaksi() {
+//   try {
+//     const data = await sql<transaksiField>`
+//   SELECT 
+//     t.id_transaksi,
+//     t.id_pelanggan,
+//     p.nama_pelanggan,
+//     p.nomor_hp_pelanggan,
+//     t.total_transaksi,
+//     t.waktu_transaksi
+// FROM transaksi t
+// JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
+// ORDER BY t.waktu_transaksi ASC;
+
+// `;
+
+//     const transaksiWithPelangganAndJenjang = data.rows;
+//     console.log('Fetched transaksi with pelanggan and jenjang details:', transaksiWithPelangganAndJenjang); // Log hasil dari database
+//     return transaksiWithPelangganAndJenjang;
+//   } catch (err) {
+//     console.error('Database Error:', err);
+//     throw new Error('Failed to fetch transaksi with pelanggan and jenjang details.');
+//   }
+// }
 
 
 
