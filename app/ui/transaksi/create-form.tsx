@@ -1,4 +1,8 @@
 'use client';
+import React, { useState } from 'react';
+import { UserCircleIcon, TrashIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Button } from '../../ui/button';
+import { useRouter } from 'next/navigation';
 import {
   transaksiField,
   karyawanField,
@@ -7,8 +11,16 @@ import {
   pelangganField,
   my_rewardField,
 } from '../../lib/definitions';
-import React, { useState } from 'react';
-import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline';
+import { createTransaksi } from '@/app/lib/action';
+
+type FormProps = {
+  transaksi: transaksiField[];
+  karyawan: karyawanField[];
+  produk: produkField[];
+  jenjang: jenjangField[];
+  pelanggan: pelangganField[];
+  my_reward: my_rewardField[];
+};
 
 export default function Form({
   transaksi = [],
@@ -17,24 +29,60 @@ export default function Form({
   jenjang = [],
   pelanggan = [],
   my_reward = [],
-}: {
-  transaksi: transaksiField[];
-  karyawan: karyawanField[];
-  produk: produkField[];
-  jenjang: jenjangField[];
-  pelanggan: pelangganField[];
-  my_reward: my_rewardField[];
-}) {
-  const [produkList, setProdukList] = useState<
-    { id_produk: string; nama_produk: string; harga_produk: number; quantity: number }[]
-  >([]);
-  const [selectedPelanggan, setSelectedPelanggan] = useState<pelangganField | null>(null);
-  const [discount, setDiscount] = useState('');
+}: FormProps) {
+  const router = useRouter();
+
+  const [produkList, setProdukList] = useState<{
+    id_produk: string;
+    nama_produk: string;
+    harga_produk: number;
+    quantity: number;
+  }[]>([]);
+  const [diskon, setDiskon] = useState<number>(0);
+  const [selectedPelanggan, setSelectedPelanggan] = useState<string>(''); // Pelanggan opsional
+  const [uangDiterima, setUangDiterima] = useState<string>(''); // Simpan input sebagai string
+  const [kembalian, setKembalian] = useState<number>(0);
 
   const totalTransaksi = produkList.reduce(
     (total, produkItem) => total + produkItem.harga_produk * produkItem.quantity,
     0
   );
+
+  const totalSetelahDiskon = totalTransaksi * (1 - diskon / 100);
+
+  const updateDiskon = (id_pelanggan: string) => {
+    if (!id_pelanggan) {
+      setDiskon(0); // Jika pelanggan tidak dipilih, diskon 0%
+      return;
+    }
+
+    const selectedPelangganData = pelanggan.find((p) => p.id_pelanggan === id_pelanggan);
+    if (!selectedPelangganData) return;
+
+    const poin = selectedPelangganData.poin || 0;
+
+    if (poin >= 100000) {
+      setDiskon(20);
+    } else if (poin >= 50000) {
+      setDiskon(15);
+    } else if (poin >= 10000) {
+      setDiskon(10);
+    } else {
+      setDiskon(0);
+    }
+  };
+
+  const handleUangDiterimaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const numericValue = parseFloat(value);
+
+    setUangDiterima(value); // Tetap simpan sebagai string untuk input form
+    if (!isNaN(numericValue) && numericValue >= 0) {
+      setKembalian(numericValue - totalSetelahDiskon);
+    } else {
+      setKembalian(0);
+    }
+  };
 
   const handleAddProduct = (id_produk: string) => {
     const selectedProduct = produk.find((p) => p.id_produk === id_produk);
@@ -60,117 +108,161 @@ export default function Form({
     });
   };
 
-  const formatRupiah = (value: number) =>
-    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+  const handleDecreaseProduct = (id_produk: string) => {
+    setProdukList((prev) => {
+      const updatedList = prev
+        .map((produkItem) => {
+          if (produkItem.id_produk === id_produk) {
+            if (produkItem.quantity === 1) return null;
+            return { ...produkItem, quantity: produkItem.quantity - 1 };
+          }
+          return produkItem;
+        })
+        .filter((produkItem) => produkItem !== null) as typeof produkList;
+      return updatedList;
+    });
+  };
+
+  const handleDeleteProduct = (id_produk: string) => {
+    setProdukList((prev) => prev.filter((produkItem) => produkItem.id_produk !== id_produk));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const uangDiterimaNum = parseFloat(uangDiterima); // Konversi string ke angka
+    if (isNaN(uangDiterimaNum) || uangDiterimaNum < totalSetelahDiskon) {
+      alert('Uang yang diterima tidak mencukupi.');
+      return;
+    }
+
+    const selectedPelangganData = pelanggan.find((p) => p.id_pelanggan === selectedPelanggan) || {
+      id_pelanggan: null,
+      nama_pelanggan: null,
+      nomor_hp_pelanggan: null,
+      poin: 0,
+    };
+
+    const pointsToAdd = Math.floor(totalTransaksi / 100);
+    const updatedPelangganData = {
+      ...selectedPelangganData,
+      poin: (selectedPelangganData.poin || 0) + pointsToAdd,
+    };
+
+    const formData = new FormData();
+    formData.append('id_pelanggan', updatedPelangganData.id_pelanggan || 'null');
+    formData.append('nama_pelanggan', updatedPelangganData.nama_pelanggan || 'null');
+    formData.append('nomor_hp_pelanggan', updatedPelangganData.nomor_hp_pelanggan || 'null');
+    formData.append('total_transaksi', totalSetelahDiskon.toString());
+    formData.append('diskon', diskon.toString());
+    formData.append('waktu_transaksi', new Date().toISOString());
+    formData.append('produkList', JSON.stringify(produkList));
+
+    try {
+      await createTransaksi(formData);
+      console.log('Transaksi berhasil disimpan.');
+      router.push('/dashboard/transaksi');
+    } catch (error) {
+      console.error('Terjadi kesalahan:', error);
+      router.push('/dashboard/transaksi');
+    }
+  };
 
   return (
-    <form>
-      <div className="rounded-md bg-[#D4B499] p-4 md:p-6">
-        <h2 className="text-lg font-semibold mb-6">Tambah Transaksi</h2>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="rounded-md bg-[#D4B499] p-4 md:p-6 shadow-lg">
+        <h2 className="text-lg font-semibold mb-6 text-gray-800">Tambah Transaksi</h2>
 
-        {/* Pilih Pelanggan */}
         <div className="mb-4">
-          <label htmlFor="pelanggan" className="mb-2 block text-sm font-medium">
-            Pilih Pelanggan
+          <label htmlFor="id_pelanggan" className="mb-2 block text-sm font-medium text-gray-700">
+            Pilih Pelanggan (Opsional)
           </label>
           <select
-            id="pelanggan"
-            name="pelanggan"
-            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm bg-[#D4B499]"
-            value={selectedPelanggan?.id_pelanggan || ''}
+            id="id_pelanggan"
+            className="block w-full rounded-md border border-gray-300 py-2 pl-10 focus:ring-[#D4B499] focus:border-[#D4B499]"
+            value={selectedPelanggan}
             onChange={(e) => {
-              const pelangganId = e.target.value;
-              const pelangganData = pelanggan.find((p) => p.id_pelanggan === pelangganId);
-              setSelectedPelanggan(pelangganData || null);
+              const idPelanggan = e.target.value;
+              setSelectedPelanggan(idPelanggan);
+              updateDiskon(idPelanggan);
             }}
           >
-            <option value="" disabled>
-              Pilih Pelanggan
-            </option>
-            {pelanggan.map((p) => (
-              <option key={p.id_pelanggan} value={p.id_pelanggan}>
-                {p.nama_pelanggan} - {p.nomor_hp_pelanggan}
+            <option value="">Tidak Ada Pelanggan</option>
+            {pelanggan.map((pelangganItem) => (
+              <option key={pelangganItem.id_pelanggan} value={pelangganItem.id_pelanggan}>
+                {pelangganItem.nama_pelanggan} - {pelangganItem.nomor_hp_pelanggan} - {pelangganItem.poin}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Tampilkan Nomor HP Pelanggan */}
         <div className="mb-4">
-          <label htmlFor="nomor_hp_pelanggan" className="mb-2 block text-sm font-medium">
-            No HP Pelanggan
-          </label>
-          <input
-            id="nomor_hp_pelanggan"
-            name="nomor_hp_pelanggan"
-            type="text"
-            value={selectedPelanggan?.nomor_hp_pelanggan || ''}
-            readOnly
-            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
-          />
-        </div>
-
-        {/* Pilihan Produk */}
-        <div className="mb-4">
-          <label htmlFor="produk" className="mb-2 block text-sm font-medium">
+          <label htmlFor="id_produk" className="mb-2 block text-sm font-medium text-gray-700">
             Pilih Produk
           </label>
           <select
-            id="produk"
-            name="produk"
-            className="block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-3 text-sm bg-[#D4B499]"
-            defaultValue=""
+            id="id_produk"
+            className="block w-full rounded-md border border-gray-300 py-2 pl-10 focus:ring-[#D4B499] focus:border-[#D4B499]"
             onChange={(e) => handleAddProduct(e.target.value)}
-            required
           >
             <option value="" disabled>
               Pilih Produk
             </option>
-            {produk.map((product) => (
-              <option key={product.id_produk} value={product.id_produk}>
-                {product.nama_produk} - {formatRupiah(product.harga_produk)}
+            {produk.map((produkItem) => (
+              <option key={produkItem.id_produk} value={produkItem.id_produk}>
+                {produkItem.nama_produk} - Rp. {produkItem.harga_produk.toLocaleString()}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Daftar Produk yang Dipilih */}
-        {produkList.map((produkItem) => (
-          <div key={produkItem.id_produk} className="mb-4 flex items-center">
-            <div className="flex-grow">
-              <label className="mb-2 block text-sm font-medium">
-                {produkItem.nama_produk}
-              </label>
-              <input
-                type="text"
-                value={formatRupiah(produkItem.harga_produk)}
-                readOnly
-                className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
-              />
-            </div>
-          </div>
-        ))}
+        <ul>
+          {produkList.map((produkItem) => (
+            <li key={produkItem.id_produk} className="flex justify-between items-center p-2 bg-gray-100 rounded-md mb-2">
+              <span className="font-semibold">{produkItem.nama_produk}</span>
+              <span className="text-gray-500">Rp. {produkItem.harga_produk.toLocaleString()}</span>
+              <div className="flex items-center space-x-2">
+                <Button onClick={() => handleDecreaseProduct(produkItem.id_produk)} className="p-1">
+                  <MinusIcon className="w-4 h-4 text-gray-500" />
+                </Button>
+                <span>{produkItem.quantity}</span>
+                <Button onClick={() => handleAddProduct(produkItem.id_produk)} className="p-1">
+                  <PlusIcon className="w-4 h-4 text-gray-500" />
+                </Button>
+                <Button onClick={() => handleDeleteProduct(produkItem.id_produk)} className="p-1">
+                  <TrashIcon className="w-4 h-4 text-red-500" />
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-        {/* Total Transaksi */}
         <div className="mb-4">
-          <label className="mb-2 block text-sm font-medium">Total Transaksi</label>
+          <label htmlFor="uangDiterima" className="mb-2 block text-sm font-medium text-gray-700">
+            Uang Diterima
+          </label>
           <input
-            type="text"
-            value={formatRupiah(totalTransaksi)}
-            readOnly
-            className="block w-full rounded-md border border-gray-200 py-2 pl-3 text-sm text-gray-900 bg-[#D4B499]"
+            id="uangDiterima"
+            type="number"
+            min="0"
+            className="block w-full rounded-md border border-gray-300 py-2 pl-10 focus:ring-[#D4B499] focus:border-[#D4B499]"
+            value={uangDiterima}
+            onChange={handleUangDiterimaChange}
           />
         </div>
 
-        {/* Tombol Simpan */}
-        <div className="mt-6 flex justify-end">
-          <button
-            type="submit"
-            className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-          >
-            Simpan
-          </button>
+        <div className="flex justify-between">
+          <p>Total Transaksi: Rp. {totalTransaksi.toLocaleString()}</p>
+          <p>Diskon: {diskon}%</p>
         </div>
+        <div className="flex justify-between">
+          <p>Total Setelah Diskon: Rp. {totalSetelahDiskon.toLocaleString()}</p>
+          <p>Kembalian: Rp. {kembalian.toLocaleString()}</p>
+        </div>
+
+        <Button type="submit" className="bg-[#D4B499] text-white font-semibold">
+          Simpan Transaksi
+        </Button>
       </div>
     </form>
   );
