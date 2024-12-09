@@ -1,8 +1,11 @@
 import Image from 'next/image';
+import { lusitana } from '@/app/ui/fonts';
+import Search from '@/app/ui/search';
+import { CustomersTableType, FormattedCustomersTable } from '@/app/lib/definitions';
 import { fetchFilteredProduk } from '@/app/lib/data';
 import { UpdateProduk, DeleteProduk } from './buttons';
 
-export default async function ProdukTable({
+export default async function produkTable({
   query,
   currentPage,
 }: {
@@ -27,28 +30,14 @@ export default async function ProdukTable({
                     <div className="flex items-center justify-between pb-4">
                       <div>
                         <div className="mb-2">
-                          <p className="text-sm font-medium text-gray-900">{p.nama_produk}</p>
+                          <p className="text-sm font-medium text-gray-900">{p.id_produk}</p>
                         </div>
-                        <p className="text-sm text-gray-500">Harga: Rp {p.harga_produk}</p>
-                        <p className="text-sm text-gray-500">Kategori: {p.kategori_produk}</p>
+                        <p className="text-sm text-gray-500">{p.harga_produk}</p>
+                        <p className="text-sm text-gray-500">{p.nama_produk}</p>
                       </div>
-                      <div className="flex flex-col items-center gap-2">
-                        {p.gambar ? (
-                          <Image
-                            src={`/images/${p.gambar}`}
-                            alt={p.nama_produk}
-                            width={64}
-                            height={64}
-                            className="object-cover rounded-lg"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="text-gray-500">No image</span>
-                        )}
-                        <div className="flex gap-2">
-                          <UpdateProduk id_produk={p.id_produk} />
-                          <DeleteProduk id={p.id_produk} />
-                        </div>
+                      <div className="flex gap-2 items-center">
+                        <UpdateProduk id_produk={p.id_produk} />
+                        <DeleteProduk id={p.id_produk} />
                       </div>
                     </div>
                   </div>
@@ -80,34 +69,31 @@ export default async function ProdukTable({
                   {produk?.map((p, index) => (
                     <tr
                       key={p.id_produk}
-                      className={`group transition-transform transform hover:scale-105 ${
-                        index % 2 === 0 ? 'bg-[#D8BAA2]' : 'bg-[#F0D6C1]'
-                      } hover:bg-[#4A3622] hover:text-white hover:shadow-lg`}
+                      className={`group transition-transform transform hover:scale-105 ${index % 2 === 0 ? 'bg-[#D8BAA2]' : 'bg-[#F0D6C1]'} hover:bg-[#4A3622] hover:text-white hover:shadow-lg`}
                     >
-                      <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                      <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         {p.nama_produk}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3 text-sm text-center">
-                        Rp {p.harga_produk}
+                      <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
+                        {p.harga_produk}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                      <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         {p.kategori_produk}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                      <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         {p.gambar ? (
                           <Image
-                            src={`/images/${p.gambar}`}
+                            src={`/images/${p.gambar}`} // Pastikan gambar diambil dengan benar dari public/images/
                             alt={p.nama_produk}
-                            width={64}
-                            height={64}
-                            className="object-cover rounded-lg"
-                            loading="lazy"
+                            width={64}  // Atur lebar gambar
+                            height={64} // Atur tinggi gambar
+                            className="object-cover rounded-lg" // Styling gambar
                           />
                         ) : (
-                          <span className="text-gray-500">No image</span>
+                          'No image' // Jika gambar tidak ada, tampilkan pesan
                         )}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3 text-sm text-center">
+                      <td className="border border-gray-300 px-4 py-3 text-sm text-center transition-all duration-300 ease-in-out">
                         <div className="flex justify-center items-center gap-3">
                           <UpdateProduk id_produk={p.id_produk} />
                           <DeleteProduk id={p.id_produk} />
