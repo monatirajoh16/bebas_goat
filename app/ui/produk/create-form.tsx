@@ -7,43 +7,47 @@ import { Button } from '../../ui/button';
 import { createProduk } from '@/app/lib/action';
 import React, { useState } from 'react';
 
-export default function Form({
-  produk = [],
-}: {
-  produk: produkField[];
-}) {
+export default function Form({ produk = [] }: { produk: produkField[] }) {
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
     const namaProduk = formData.get('nama_produk')?.toString().trim();
     const hargaProduk = formData.get('harga_produk');
     const kategoriProduk = formData.get('kategori_produk');
     const gambar = formData.get('gambar');
 
-    // Validation: Check for empty fields
     if (!namaProduk || !hargaProduk || !kategoriProduk || !gambar) {
       setError('Data Belum Diisi.');
       return;
     }
 
-    // Validation: Check for duplicate nama_produk
     const isDuplicate = produk.some((item) => item.nama_produk.toLowerCase() === namaProduk.toLowerCase());
     if (isDuplicate) {
       setError('Data Sudah Ada.');
       return;
     }
 
-    // Clear error and proceed with form submission
     setError(null);
-    await createProduk(formData);
+
+    try {
+      const response = await createProduk(formData);
+      setSuccess('Produk berhasil dibuat!');
+      console.log('Response:', response);
+    } catch (err) {
+      console.error(err);
+      setError('Gagal membuat produk.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {success && <p className="mb-4 text-sm text-green-600">{success}</p>}
 
         {/* Nama Produk */}
         <div className="mb-4">
@@ -113,14 +117,11 @@ export default function Form({
               name="gambar"
               type="file"
               accept="image/*"
-              placeholder="Pilih gambar produk"
               className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               required
             />
-            <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
           </div>
         </div>
-
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
