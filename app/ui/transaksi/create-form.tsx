@@ -173,6 +173,7 @@ export default function Form({
       <div className="rounded-md bg-[#D4B499] p-4 md:p-6 shadow-lg">
         <h2 className="text-lg font-semibold mb-6 text-gray-800">Tambah Transaksi</h2>
 
+        {/* Pilih Pelanggan */}
         <div className="mb-4">
           <label htmlFor="id_pelanggan" className="mb-2 block text-sm font-medium text-gray-700">
             Pilih Pelanggan (Opsional)
@@ -190,12 +191,11 @@ export default function Form({
             <option value="">Tidak Ada Pelanggan</option>
             {pelanggan.map((pelangganItem) => (
               <option key={pelangganItem.id_pelanggan} value={pelangganItem.id_pelanggan}>
-                {pelangganItem.nama_pelanggan} - {pelangganItem.nomor_hp_pelanggan} - {pelangganItem.poin}
+                {pelangganItem.nama_pelanggan} - {pelangganItem.nomor_hp_pelanggan} - Poin: {pelangganItem.poin}
               </option>
             ))}
           </select>
         </div>
-
         <div className="mb-4">
           <label htmlFor="id_produk" className="mb-2 block text-sm font-medium text-gray-700">
             Pilih Produk
