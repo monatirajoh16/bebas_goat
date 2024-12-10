@@ -61,7 +61,7 @@ export function ReportFilterUI() {
     const margin = 14;
     const lineHeight = 8;
     const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
-    const columnWidths = [35, 35, 35, 35, 25, 35, 30]; // Lebar kolom
+    const columnWidths = [35, 35, 35, 35]; // Lebar kolom
     const startX = 14; // Posisi awal tabel
     const tableStartY = 50;
     const headerHeight = 8;
