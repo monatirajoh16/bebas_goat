@@ -61,7 +61,7 @@ export function ReportFilterUI() {
     const margin = 14; // Margin kiri dan kanan
     const lineHeight = 8; // Tinggi per baris teks
     const tableStartY = 50; // Posisi awal tabel
-    const columnWidths = [25, 25, 25, 25]; // Lebar masing-masing kolom
+    const columnWidths = [40, 30, 50, 40]; // Lebar kolom disesuaikan
     const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
     let startY = tableStartY; // Posisi vertikal awal
 
@@ -95,7 +95,7 @@ export function ReportFilterUI() {
 
         row.forEach((cell, index) => {
             const colX = margin + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-            doc.text(cell, colX, startY);
+            doc.text(cell, colX, startY, { align: "left" });
         });
 
         startY += lineHeight; // Pindahkan ke baris berikutnya
@@ -116,6 +116,7 @@ export function ReportFilterUI() {
     // Simpan file PDF
     doc.save("laporan_transaksi.pdf");
 };
+
 
 
 
