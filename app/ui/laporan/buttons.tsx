@@ -76,7 +76,7 @@ export function ReportFilterUI() {
     });
 
     // Render isi tabel
-    startY += 8; // Tambahkan jarak untuk baris berikutnya
+    startY += 10; // Tambahkan jarak untuk baris berikutnya
     filteredData.forEach((item) => {
         const row = [
             item.id_transaksi,
@@ -93,7 +93,7 @@ export function ReportFilterUI() {
             );
         });
 
-        startY += 8; // Tambahkan jarak untuk baris berikutnya
+        startY += 10; // Tambahkan jarak untuk baris berikutnya
     });
 
     // Simpan file PDF
