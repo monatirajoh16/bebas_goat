@@ -57,16 +57,15 @@ export function ReportFilterUI() {
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth(); // Lebar halaman
-    const pageHeight = doc.internal.pageSize.getHeight(); // Tinggi halaman
     const margin = 14; // Margin kiri dan kanan
-    const lineHeight = 8; // Tinggi per baris teks
+    const lineHeight = 10; // Tinggi per baris teks
+    const columnWidths = [40, 40, 60, 60]; 
+    const startX = margin;
     const tableStartY = 50; // Posisi awal tabel
-    const columnWidths = [40, 40, 60, 40]; // Lebar masing-masing kolom
-    const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
-    const padding = 3; // Padding dalam kolom
-    let startY = tableStartY; // Posisi vertikal awal
+    const headerHeight = 8;
+    // Lebar masing-masing kolom
+    
 
-    // Tambahkan judul laporan
     doc.setFontSize(14);
     doc.text("Laporan Transaksi Penjualan", pageWidth / 2, 20, { align: "center" });
 
@@ -75,50 +74,70 @@ export function ReportFilterUI() {
     doc.text(`Periode: ${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`, margin, 30);
     doc.text(`Total Pendapatan: Rp ${totalPendapatan.toLocaleString()}`, margin, 40);
 
-    // Render header tabel
-    doc.setFontSize(10);
+
+    const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
+    let startY = tableStartY; // Posisi vertikal awal
+    // Header tabel
+     doc.setFontSize(10);
     headers.forEach((header, index) => {
-        const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-        doc.text(header, colX, startY);
+      const columnX = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+      doc.text(header, columnX, startY);
     });
 
-    startY += lineHeight; // Pindahkan ke baris berikutnya
+
+    doc.setLineWidth(0.5);
+    doc.line(startX, startY + headerHeight, pageWidth - margin, startY + headerHeight);
+  
+    startY += headerHeight + 5 ; // Geser Y agar data mulai dari bawah tabel header
+// Pindahkan ke baris berikutnya
 
     // Render isi tabel
-    filteredData.forEach((item, rowIndex) => {
-        const row = [
-            item.id_transaksi,
-            new Date(item.waktu_transaksi).toLocaleDateString(),
-            item.nama_pelanggan.length > 20
-                ? `${item.nama_pelanggan.slice(0, 17)}...`
-                : item.nama_pelanggan,
-            `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`,
-        ];
-
-        row.forEach((cell, index) => {
-            const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-            doc.text(cell, colX, startY);
-        });
-
-        startY += lineHeight; // Pindahkan ke baris berikutnya
-
-        // Tambahkan halaman baru jika mencapai batas halaman
-        if (startY > pageHeight - margin) {
-            doc.addPage();
-            startY = tableStartY; // Reset posisi Y
-            // Cetak ulang header tabel di halaman baru
-            headers.forEach((header, index) => {
-                const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-                doc.text(header, colX, startY);
-            });
-            startY += lineHeight; // Pindahkan ke baris berikutnya
-        }
-    });
+    filteredData.forEach((item, index) => {
+      // Check if the current Y position exceeds the page height
+      if (startY > doc.internal.pageSize.getHeight() - margin) {
+          // If the page is full, add a new page
+          doc.addPage();
+          startY = tableStartY; // Reset to the start of the table on the new page
+  
+          // Print the header again on the new page
+          headers.forEach((header, headerIndex) => {
+              const columnX = startX + columnWidths.slice(0, headerIndex).reduce((a, b) => a + b, 0);
+              doc.text(header, columnX, startY);
+          });
+          
+          startY += headerHeight + 5; // Move Y position down after header
+      }
+  
+      // Prepare the row data
+      const row = [
+          item.id_transaksi,
+          new Date(item.waktu_transaksi).toLocaleDateString(),
+          item.nama_pelanggan.length > 20
+              ? `${item.nama_pelanggan.slice(0, 17)}...` // Limit the length of the customer's name
+              : item.nama_pelanggan,
+          `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`
+      ];
+  
+      // Write the row data to the PDF
+      row.forEach((cell, colIndex) => {
+          const columnX = startX + columnWidths.slice(0, colIndex).reduce((a, b) => a + b, 0);
+          doc.text(cell, columnX, startY);
+      });
+  
+      startY += lineHeight; // Move to the next row
+  });
+  
+  // Total Transaksi calculation
+  const totalTransaksi = filteredData.reduce((sum, item) => sum + item.total_transaksi, 0);
+  
+  startY += 10; // Move down before printing the total
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total Transaksi: Rp ${totalTransaksi.toLocaleString()}`, startX, startY);
+  
 
     // Simpan file PDF
     doc.save("laporan_transaksi.pdf");
 };
-
 
 
 
