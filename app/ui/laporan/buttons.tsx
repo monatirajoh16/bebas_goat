@@ -59,7 +59,7 @@ export function ReportFilterUI() {
     const pageWidth = doc.internal.pageSize.getWidth(); // Lebar halaman
     const margin = 14; // Margin kiri dan kanan
     const lineHeight = 10; // Tinggi per baris teks
-    const columnWidths = [100, 40, 50, 40]; 
+    const columnWidths = [80, 40, 30, 40]; 
     const startX = margin;
     const tableStartY = 50; // Posisi awal tabel
     const headerHeight = 8;

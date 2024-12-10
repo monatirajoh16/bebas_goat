@@ -66,14 +66,7 @@ const PDFGenerator: React.FC<PDFGeneratorProps> = ({ transaksi }) => {
       yPosition += lineSpacing;
       doc.text(`Tanggal Transaksi: ${transaksi.waktu_transaksi}`, 10, yPosition);
       yPosition += lineSpacing;
-      doc.text(`Poin: ${transaksi.poin}`, 10, yPosition);
-      yPosition += lineSpacing;
-      doc.text(`Nama Jenjang: ${transaksi.nama_jenjang}`, 10, yPosition);
-      yPosition += lineSpacing;
-      doc.text(`Diskon: ${transaksi.diskon}%`, 10, yPosition);
-      yPosition += lineSpacing;
-      doc.text(`Batas Pemakaian: ${transaksi.batas_pemakaian}`, 10, yPosition);
-      yPosition += lineSpacing * 2; // Beri jarak lebih besar
+      
 
       // Tambahkan detail pesanan jika ada
       if (transaksi.detail_pesanan && transaksi.detail_pesanan.length > 0) {
