@@ -59,7 +59,7 @@ export function ReportFilterUI() {
     const pageWidth = doc.internal.pageSize.getWidth(); // Lebar halaman
     const margin = 14; // Margin kiri dan kanan
     const lineHeight = 10; // Tinggi per baris teks
-    const columnWidths = [40, 40, 60, 60]; 
+    const columnWidths = [100, 40, 50, 40]; 
     const startX = margin;
     const tableStartY = 50; // Posisi awal tabel
     const headerHeight = 8;
@@ -132,7 +132,7 @@ export function ReportFilterUI() {
   
   startY += 10; // Move down before printing the total
   doc.setFont("helvetica", "bold");
-  doc.text(`Total Transaksi: Rp ${totalTransaksi.toLocaleString()}`, startX, startY);
+  // doc.text(`Total Transaksi: Rp ${totalTransaksi.toLocaleString()}`, startX, startY);
   
 
     // Simpan file PDF
