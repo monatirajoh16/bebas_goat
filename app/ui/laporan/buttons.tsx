@@ -66,13 +66,17 @@ export function ReportFilterUI() {
 
     // Definisi header tabel
     const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
-    const columnWidths = [50, 40, 60, 40]; // Lebar kolom
+    const columnWidths = [40, 40, 60, 40]; // Lebar kolom
     const startX = 14; // Posisi awal tabel
     let startY = 40; // Posisi awal baris
 
-    // Render header tabel
+    // Render header tabel dengan latar belakang
+    doc.setFontSize(10);
+    doc.setFillColor(200, 200, 200);
     headers.forEach((header, index) => {
-        doc.text(header, startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0), startY);
+        const colX = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+        doc.rect(colX - 2, startY - 7, columnWidths[index], 10, "F"); // Rectangle background
+        doc.text(header, colX, startY);
     });
 
     // Render isi tabel
@@ -81,19 +85,22 @@ export function ReportFilterUI() {
         const row = [
             item.id_transaksi,
             new Date(item.waktu_transaksi).toLocaleDateString(),
-            item.nama_pelanggan,
+            item.nama_pelanggan.length > 25
+                ? `${item.nama_pelanggan.slice(0, 22)}...`
+                : item.nama_pelanggan, // Batasi panjang nama
             `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`
         ];
 
         row.forEach((cell, index) => {
-            doc.text(
-                cell,
-                startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0),
-                startY
-            );
+            const colX = startX + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+            doc.text(cell, colX, startY);
         });
 
         startY += 10; // Tambahkan jarak untuk baris berikutnya
+        if (startY > 280) { // Jika melewati batas halaman, tambahkan halaman baru
+            doc.addPage();
+            startY = 20; // Reset posisi Y
+        }
     });
 
     // Simpan file PDF
