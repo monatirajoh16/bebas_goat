@@ -61,10 +61,12 @@ export function ReportFilterUI() {
     const margin = 14; // Margin kiri dan kanan
     const lineHeight = 8; // Tinggi per baris teks
     const tableStartY = 50; // Posisi awal tabel
-    const columnWidths = [40, 30, 50, 40]; // Lebar kolom disesuaikan
+    const columnWidths = [40, 40, 60, 40]; // Lebar masing-masing kolom
     const headers = ["ID Transaksi", "Tanggal Transaksi", "Nama Pelanggan", "Total Transaksi"];
+    const padding = 3; // Padding dalam kolom
     let startY = tableStartY; // Posisi vertikal awal
 
+    // Tambahkan judul laporan
     doc.setFontSize(14);
     doc.text("Laporan Transaksi Penjualan", pageWidth / 2, 20, { align: "center" });
 
@@ -73,10 +75,10 @@ export function ReportFilterUI() {
     doc.text(`Periode: ${startDate?.toLocaleDateString()} - ${endDate?.toLocaleDateString()}`, margin, 30);
     doc.text(`Total Pendapatan: Rp ${totalPendapatan.toLocaleString()}`, margin, 40);
 
-    // Header tabel
+    // Render header tabel
     doc.setFontSize(10);
     headers.forEach((header, index) => {
-        const colX = margin + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+        const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
         doc.text(header, colX, startY);
     });
 
@@ -89,13 +91,13 @@ export function ReportFilterUI() {
             new Date(item.waktu_transaksi).toLocaleDateString(),
             item.nama_pelanggan.length > 20
                 ? `${item.nama_pelanggan.slice(0, 17)}...`
-                : item.nama_pelanggan, // Batasi panjang nama pelanggan
-            `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`
+                : item.nama_pelanggan,
+            `Rp ${parseFloat(item.total_transaksi.toString().replace(/[^0-9.-]+/g, "")).toLocaleString()}`,
         ];
 
         row.forEach((cell, index) => {
-            const colX = margin + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
-            doc.text(cell, colX, startY, { align: "left" });
+            const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+            doc.text(cell, colX, startY);
         });
 
         startY += lineHeight; // Pindahkan ke baris berikutnya
@@ -106,7 +108,7 @@ export function ReportFilterUI() {
             startY = tableStartY; // Reset posisi Y
             // Cetak ulang header tabel di halaman baru
             headers.forEach((header, index) => {
-                const colX = margin + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
+                const colX = margin + padding + columnWidths.slice(0, index).reduce((a, b) => a + b, 0);
                 doc.text(header, colX, startY);
             });
             startY += lineHeight; // Pindahkan ke baris berikutnya
