@@ -43,6 +43,7 @@ export default function Form({
   const [uangDiterima, setUangDiterima] = useState<string>(''); // Simpan input sebagai string
   const [kembalian, setKembalian] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>(''); // Pesan error untuk pelanggan
+  const [produkErrorMessage, setProdukErrorMessage] = useState<string>(''); // Pesan error untuk produk
 
   const totalTransaksi = produkList.reduce(
     (total, produkItem) => total + produkItem.harga_produk * produkItem.quantity,
@@ -137,6 +138,12 @@ export default function Form({
     }
     setErrorMessage(''); // Reset pesan error jika validasi lolos
 
+    if (produkList.length === 0) {
+      setProdukErrorMessage('Pilih produk terlebih dahulu.');
+      return;
+    }
+    setProdukErrorMessage(''); // Reset produk error if a product is selected
+
     const uangDiterimaNum = parseFloat(uangDiterima); // Konversi string ke angka
     if (isNaN(uangDiterimaNum) || uangDiterimaNum < totalSetelahDiskon) {
       alert('Uang yang diterima tidak mencukupi.');
@@ -178,7 +185,7 @@ export default function Form({
         {/* Pilih Pelanggan */}
         <div className="mb-4">
           <label htmlFor="id_pelanggan" className="mb-2 block text-sm font-medium text-gray-700">
-            Pilih Pelanggan 
+            Pilih Pelanggan
           </label>
           <select
             id="id_pelanggan"
@@ -221,6 +228,7 @@ export default function Form({
               </option>
             ))}
           </select>
+          {produkErrorMessage && <p className="text-red-500 text-sm mt-2">{produkErrorMessage}</p>}
         </div>
 
         <ul>
